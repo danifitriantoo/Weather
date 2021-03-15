@@ -6,9 +6,11 @@ import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -17,6 +19,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -24,9 +27,10 @@ public class MainActivity extends AppCompatActivity {
 
     private ProgressDialog pDialog;
     private ListView lv;
+    private List<String> allNames = new ArrayList<String>();
 
     // URL to get contacts JSON
-    private static String url = "https://api.androidhive.info/contacts/";
+    private static String url = "https://indonesia-covid-19.mathdro.id/api/provinsi/";
 
     ArrayList<HashMap<String, String>> contactList;
 
@@ -36,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         contactList = new ArrayList<>();
+
 
         lv = (ListView) findViewById(R.id.list);
 
@@ -72,24 +77,16 @@ public class MainActivity extends AppCompatActivity {
                     JSONObject jsonObj = new JSONObject(jsonStr);
 
                     // Getting JSON Array node
-                    JSONArray contacts = jsonObj.getJSONArray("contacts");
+                    JSONArray contacts = jsonObj.getJSONArray("data");
+
 
                     // looping through All Contacts
                     for (int i = 0; i < contacts.length(); i++) {
                         JSONObject c = contacts.getJSONObject(i);
 
-                        String id = c.getString("id");
-                        String name = c.getString("name");
-                        String email = c.getString("email");
-                        String address = c.getString("address");
-                        String gender = c.getString("gender");
-
-                        // Phone node is JSON Object
-                        JSONObject phone = c.getJSONObject("phone");
-                        String mobile = phone.getString("mobile");
-                        String home = phone.getString("home");
-                        String office = phone.getString("office");
-
+                        String id = c.getString("provinsi");
+                        String name = c.getString("kasusPosi");
+                        String email = c.getString("kasusSemb");
                         // tmp hash map for single contact
                         HashMap<String, String> contact = new HashMap<>();
 
@@ -97,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
                         contact.put("id", id);
                         contact.put("name", name);
                         contact.put("email", email);
-                        contact.put("mobile", mobile);
+                        allNames.add(id);
 
                         // adding contact to contact list
                         contactList.add(contact);
@@ -143,9 +140,13 @@ public class MainActivity extends AppCompatActivity {
              * */
             ListAdapter adapter = new SimpleAdapter(
                     MainActivity.this, contactList,
-                    R.layout.list_item, new String[]{"name", "email",
-                    "mobile"}, new int[]{R.id.name,
+                    R.layout.list_item, new String[]{"id", "name",
+                    "email"}, new int[]{R.id.name,
                     R.id.email, R.id.mobile});
+
+            Spinner spinner = (Spinner) findViewById(R.id.listprov);
+            ArrayAdapter x= new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_list_item_1,allNames);
+            spinner.setAdapter(x);
 
             lv.setAdapter(adapter);
         }
