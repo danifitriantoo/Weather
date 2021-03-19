@@ -28,24 +28,24 @@ class HttpPostHandler extends AsyncTask<String, Void, String> {
     protected String doInBackground(String... Urls) {
         DataOutputStream wr = null;
         try {
-            URL url = new URL("http://192.168.43.232:5000/api/TodoItems");
+            URL url = new URL("http://192.168.56.1:5000/api/TodoItems/8");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("POST");
+            connection.setRequestMethod("PUT");
             connection.setDoOutput(true);
 
-            String urlnew = "http://192.168.43.232:5000/api/TodoItems";
+            String urlnew = "http://192.168.56.1:5000/api/TodoItems/8";
             URL obj = new URL(urlnew);
             HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 
             //add request header
-            con.setRequestMethod("POST");
+            con.setRequestMethod("DELETE");
             con.setDoOutput(true);
             con.setRequestProperty("Content-Type", "application/json");
 
             // Send post request
             JSONObject obj2 = new JSONObject();
             obj2.put("id", 8);
-            obj2.put("name", "dani");
+            obj2.put("name", "x");
             System.out.print(obj2);
 
             BufferedWriter out =

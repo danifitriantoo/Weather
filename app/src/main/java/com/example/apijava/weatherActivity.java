@@ -3,14 +3,21 @@ package com.example.apijava;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
+import android.media.Image;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -21,8 +28,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
-
+public class weatherActivity extends AppCompatActivity {
     private String TAG = MainActivity.class.getSimpleName();
 
     private ProgressDialog pDialog;
@@ -30,30 +36,47 @@ public class MainActivity extends AppCompatActivity {
     private List<String> allNames = new ArrayList<String>();
 
     // URL to get contacts JSON
-    private static String url = "http://192.168.43.232:5000/api/TodoItems";
+    private static String url = "http://192.168.56.1:5000/api/TodoItems/";
+
+    TextView x;
+    TextView y;
+    ImageView plus;
 
     ArrayList<HashMap<String, String>> contactList;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_weather);
+        getSupportActionBar().hide();
+
+        x = (TextView) findViewById(R.id.txtCelcius);
+        y = (TextView) findViewById(R.id.txtCity);
+        plus = (ImageView) findViewById(R.id.btnA);
 
         contactList = new ArrayList<>();
-        lv = (ListView) findViewById(R.id.list);
-        new GetContacts().execute();
+        lv = (ListView) findViewById(R.id.list2);
+        new weatherActivity.GetContacts().execute();
+
+        ImageView btn = (ImageView) findViewById(R.id.btnA);
+        btn.setOnClickListener(new View.OnClickListener(){
+                public void onClick(View view) {
+                    Intent myIntent = new Intent(view.getContext(), loginActivity.class);
+                    startActivityForResult(myIntent, 0);
+                }
+
+            });
+
     }
 
-    /**
-     * Async task class to get json by making HTTP call
-     */
+
+
     private class GetContacts extends AsyncTask<Void, Void, Void> {
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
             // Showing progress dialog
-            pDialog = new ProgressDialog(MainActivity.this);
+            pDialog = new ProgressDialog(weatherActivity.this);
             pDialog.setMessage("Please wait...");
             pDialog.setCancelable(false);
             pDialog.show();
@@ -85,6 +108,9 @@ public class MainActivity extends AppCompatActivity {
                         contact.put("name", name);
                         allNames.add(id);
                         contactList.add(contact);
+
+                        x.setText(id);
+                        y.setText(name);
                     }
                 } catch (final JSONException e) {
                     Log.e(TAG, "Json parsing error: " + e.getMessage());
@@ -125,16 +151,12 @@ public class MainActivity extends AppCompatActivity {
             /**
              * Updating parsed JSON data into ListView
              * */
+
             ListAdapter adapter = new SimpleAdapter(
-                    MainActivity.this, contactList,
-                    R.layout.list_item, new String[]{"id", "name",
-                    "email"}, new int[]{R.id.name,
-                    R.id.email});
-
-            Spinner spinner = (Spinner) findViewById(R.id.listprov);
-            ArrayAdapter x= new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_list_item_1,allNames);
-            spinner.setAdapter(x);
-
+                    weatherActivity.this, contactList,
+                    R.layout.list_item, new String[]{"id", "id",
+                    "http://openweathermap.org/img/wn/10n@2x.png"}, new int[]{R.id.name,
+                    R.id.email,R.id.imageView});
             lv.setAdapter(adapter);
         }
 
