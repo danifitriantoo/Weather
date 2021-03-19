@@ -3,55 +3,62 @@ package com.example.apijava;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
+
+import javax.net.ssl.HttpsURLConnection;
+
 
 class HttpPostHandler extends AsyncTask<String, Void, String> {
 
-    @Override
-    protected String doInBackground(String... params) {
+    String responseString = "";
+    int response;
+    InputStream is = null;
 
-        String data = "";
-
-        HttpURLConnection httpURLConnection = null;
+    protected String doInBackground(String... Urls) {
+        DataOutputStream wr = null;
         try {
+            URL url = new URL("http://192.168.43.232:5000/api/TodoItems");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setDoOutput(true);
 
-            httpURLConnection = (HttpURLConnection) new URL(params[0]).openConnection();
-            httpURLConnection.setRequestMethod("POST");
+            String urlnew = "http://192.168.43.232:5000/api/TodoItems";
+            URL obj = new URL(urlnew);
+            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 
-            httpURLConnection.setDoOutput(true);
+            //add request header
+            con.setRequestMethod("POST");
+            con.setDoOutput(true);
+            con.setRequestProperty("Content-Type", "application/json");
 
-            DataOutputStream wr = new DataOutputStream(httpURLConnection.getOutputStream());
-            wr.writeBytes("PostData=" + params[1]);
-            wr.flush();
-            wr.close();
+            // Send post request
+            JSONObject obj2 = new JSONObject();
+            obj2.put("id", 8);
+            obj2.put("name", "dani");
+            System.out.print(obj2);
 
-            InputStream in = httpURLConnection.getInputStream();
-            InputStreamReader inputStreamReader = new InputStreamReader(in);
+            BufferedWriter out =
+                    new BufferedWriter(new OutputStreamWriter(con.getOutputStream()));
+            out.write(obj2.toString());
+            out.close();
 
-            int inputStreamData = inputStreamReader.read();
-            while (inputStreamData != -1) {
-                char current = (char) inputStreamData;
-                inputStreamData = inputStreamReader.read();
-                data += current;
-            }
+            int responseCode = con.getResponseCode();
+            System.out.println("Response Code : " + responseCode);
+
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            if (httpURLConnection != null) {
-                httpURLConnection.disconnect();
-            }
         }
-
-        return data;
-    }
-
-    @Override
-    protected void onPostExecute(String result) {
-        super.onPostExecute(result);
-        Log.e("TAG", result); // this is expecting a response code to be sent from your server upon receiving the POST data
+        return null;
     }
 }

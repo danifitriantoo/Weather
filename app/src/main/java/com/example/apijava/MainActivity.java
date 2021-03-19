@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
     private List<String> allNames = new ArrayList<String>();
 
     // URL to get contacts JSON
-    private static String url = "https://indonesia-covid-19.mathdro.id/api/provinsi/";
+    private static String url = "http://192.168.43.232:5000/api/TodoItems";
 
     ArrayList<HashMap<String, String>> contactList;
 
@@ -40,10 +40,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         contactList = new ArrayList<>();
-
-
         lv = (ListView) findViewById(R.id.list);
-
         new GetContacts().execute();
     }
 
@@ -74,29 +71,19 @@ public class MainActivity extends AppCompatActivity {
 
             if (jsonStr != null) {
                 try {
-                    JSONObject jsonObj = new JSONObject(jsonStr);
-
                     // Getting JSON Array node
-                    JSONArray contacts = jsonObj.getJSONArray("data");
+                    JSONArray jArr = new JSONArray(jsonStr);
 
-
-                    // looping through All Contacts
-                    for (int i = 0; i < contacts.length(); i++) {
-                        JSONObject c = contacts.getJSONObject(i);
-
-                        String id = c.getString("provinsi");
-                        String name = c.getString("kasusPosi");
-                        String email = c.getString("kasusSemb");
-                        // tmp hash map for single contact
+                    for (int count = 0; count < jArr.length(); count++) {
+                        JSONObject obj = jArr.getJSONObject(count);
+                        String id = obj.getString("id");
+                        String name = obj.getString("name");
                         HashMap<String, String> contact = new HashMap<>();
 
                         // adding each child node to HashMap key => value
                         contact.put("id", id);
                         contact.put("name", name);
-                        contact.put("email", email);
                         allNames.add(id);
-
-                        // adding contact to contact list
                         contactList.add(contact);
                     }
                 } catch (final JSONException e) {
